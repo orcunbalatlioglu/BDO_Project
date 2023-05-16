@@ -3,13 +3,6 @@ using System.Net.Sockets;
 using System.Net;
 using System.Text;
 using System.Security.Cryptography.X509Certificates;
-using Org.BouncyCastle.Crypto.Engines;
-using Org.BouncyCastle.Crypto.Modes;
-using Org.BouncyCastle.Crypto.Paddings;
-using Org.BouncyCastle.Crypto.Parameters;
-using System.Transactions;
-using System.Globalization;
-using Org.BouncyCastle.Bcpg;
 using System.Net.NetworkInformation;
 
 namespace BDO_Receiver

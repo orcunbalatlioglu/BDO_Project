@@ -1,13 +1,7 @@
-﻿using BDO_Encrypted_Data;
-using Org.BouncyCastle.Crypto.Engines;
+﻿using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Paddings;
 using Org.BouncyCastle.Crypto.Parameters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BDO_Sender
 {
