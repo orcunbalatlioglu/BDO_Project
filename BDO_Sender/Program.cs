@@ -17,9 +17,9 @@ namespace IEC62351_3_Encrypted_Data_Transfer
         static void Main(string[] args)
         {
             // Veri gönderen tarafın IP adresi, port numarası ve sertifikası
-            Console.WriteLine("Please enter your sender ip address: ");
+            Console.WriteLine("Please enter target ip address: ");
             string ipAddress = Console.ReadLine();
-            Console.WriteLine("Please enter your sender ip port: ");
+            Console.WriteLine("Please enter target port: ");
             int port = Convert.ToInt32(Console.ReadLine());
 
             Sender sender = new Sender(ipAddress, port);
@@ -85,9 +85,10 @@ namespace IEC62351_3_Encrypted_Data_Transfer
                 sslStream.Write(senderEncryptor.encryptedData, 0, senderEncryptor.outputLen);
 
                 Console.Write("\n\n\nDo you want to continue? (Y/N): ");
-                string inputChar = Console.ReadKey().ToString().ToUpper();
+                char inputChar = Console.ReadKey().KeyChar;
+                inputChar = char.ToUpper(inputChar);
                 Console.WriteLine();
-                if (inputChar == "N")
+                if (inputChar == 'N')
                 {
                     isContinue = false;
                     senderClient.Close();

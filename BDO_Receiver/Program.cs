@@ -10,6 +10,7 @@ using Org.BouncyCastle.Crypto.Parameters;
 using System.Transactions;
 using System.Globalization;
 using Org.BouncyCastle.Bcpg;
+using System.Net.NetworkInformation;
 
 namespace BDO_Receiver
 {
@@ -17,15 +18,14 @@ namespace BDO_Receiver
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Please enter your receiver ip address: ");
-            string ipAddress = Console.ReadLine();
+            string ipAddress = GetLocalIPAddress();
             Console.WriteLine("Please enter your receiver ip port: ");
             int port = Convert.ToInt32(Console.ReadLine());
             Receiver receiver = new Receiver(ipAddress, port);
             TcpListener receiverListener = new TcpListener(IPAddress.Parse(receiver.receiverIp), receiver.receiverPort);
 
             receiverListener.Start();
-            
+
             Console.WriteLine("Receiver is waiting for connection...");
 
             TcpClient receiverClient = receiverListener.AcceptTcpClient();
@@ -67,7 +67,7 @@ namespace BDO_Receiver
             // Alıcı tarafın şifre çözme ayarları
             ReceiverDecryptor receiverDecryptor = new ReceiverDecryptor(receiverKey, receiverIV);
 
-            bool isContinue = true;    
+            bool isContinue = true;
             while (isContinue)
             {
                 // Veri gönderen tarafın gönderdiği şifreli veri alınır
@@ -77,24 +77,50 @@ namespace BDO_Receiver
                 // Şifreli veri çözülür ve orijinal veri elde edilir
                 string plainText = receiverDecryptor.Decrypt(encryptedDataFromSender, bytes);
 
-                Console.WriteLine("Alıcı taraf: {0}", plainText);
+                Console.WriteLine($"Message: {plainText}");
 
                 Console.Write("\n\n\nDo you want to continue? (Y/N): ");
-                string inputChar = Console.ReadKey().ToString().ToUpper();
-                Console.WriteLine();
-                if (inputChar == "N")
+                char inputChar = Console.ReadKey().KeyChar;
+                inputChar = char.ToUpper(inputChar);
+                if (inputChar == 'N')
                 {
                     isContinue = false;
                     receiverClient.Close();
                     receiverListener.Stop();
                 }
             }
-            
+
         }
 
         private static bool ValidateClientCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
             return true;
+        }
+
+        private static string GetLocalIPAddress()
+        {
+            string ipAddress = "";
+            NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+
+            foreach (NetworkInterface networkInterface in networkInterfaces)
+            {
+                if (networkInterface.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||
+                    networkInterface.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
+                {
+                    IPInterfaceProperties properties = networkInterface.GetIPProperties();
+                    foreach (UnicastIPAddressInformation ipAddressInfo in properties.UnicastAddresses)
+                    {
+                        if (ipAddressInfo.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                        {
+                            ipAddress = ipAddressInfo.Address.ToString();
+                            break;
+                        }
+                    }
+                }
+                if (!string.IsNullOrEmpty(ipAddress))
+                    break;
+            }
+            return ipAddress;
         }
     }
 }
