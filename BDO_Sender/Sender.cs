@@ -24,12 +24,32 @@ namespace BDO_Encrypted_Data
         
         public Sender(string senderIp, int senderPort, X509Certificate2 senderCertificate)
         {
-            this.senderIp = senderIp;
+            if (ValidateIPv4(senderIp))
+                this.senderIp = senderIp;
+            else
+                throw new Exception("Entered IP address is not in formal format!");
             this.senderPort = senderPort;
             this.senderCertificate = senderCertificate;
         }
 
+        public bool ValidateIPv4(string ipString)
+        {
+            if (String.IsNullOrWhiteSpace(ipString))
+            {
+                return false;
+            }
 
-        
+            string[] splitValues = ipString.Split('.');
+            if (splitValues.Length != 4)
+            {
+                return false;
+            }
+
+            byte tempForParsing;
+
+            return splitValues.All(r => byte.TryParse(r, out tempForParsing));
+        }
+
+
     }
 }

@@ -20,14 +20,35 @@ namespace BDO_Receiver
 
         public Receiver(string receiverIp, int receiverPort) : this(receiverIp, receiverPort, new X509Certificate2("receiver_certificate.pfx", "password")) { }
 
-        public Receiver(string receiverIp, int receiverPort, string[] certificateOptions) : this(receiverIp, receiverPort, new X509Certificate2(certificateOptions[0], certificateOptions[1])) { }
+        public Receiver(string receiverIp, int receiverPort, string[] certificateOptions) : this(receiverIp, receiverPort, 
+                                                                                            new X509Certificate2(certificateOptions[0], certificateOptions[1])) { }
 
         public Receiver(string receiverIp, int receiverPort, X509Certificate2 receiverCertificate)
         {
-            this.receiverIp = receiverIp;
+            if (ValidateIPv4(receiverIp))
+                this.receiverIp = receiverIp;
+            else
+                throw new Exception("Entered IP address is not in formal format!");
             this.receiverPort = receiverPort;
             this.receiverCertificate = receiverCertificate;
         }
 
+        public bool ValidateIPv4(string ipString)
+        {
+            if (String.IsNullOrWhiteSpace(ipString))
+            {
+                return false;
+            }
+
+            string[] splitValues = ipString.Split('.');
+            if (splitValues.Length != 4)
+            {
+                return false;
+            }
+
+            byte tempForParsing;
+
+            return splitValues.All(r => byte.TryParse(r, out tempForParsing));
+        }
     }
 }
